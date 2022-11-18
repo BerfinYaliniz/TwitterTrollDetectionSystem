@@ -13,8 +13,8 @@ def index():
 def mak_logic():
     keyword = request.form.get('keyword')
     sa = makineogren()
-    keyword1 = sa.DownloadData(keyword)
-    return render_template('result.html', keyword=keyword1)
+    pred, keyword1 = sa.DownloadData(keyword)
+    return render_template('result.html', keyword=keyword1, pred=pred)
 
 
 if __name__ == '__main__':

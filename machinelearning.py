@@ -153,6 +153,14 @@ class makineogren():
         # Checking accuracy
         data_df = pd.read_csv('data/sonuc.csv', encoding=('ISO-8859-1'))
         dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
+        pred = model.predict(dataset)
+        if pred == 1:
+            pred = "trol"
+        else:
+            pred = "trol değil"
+        print("multinom", pred)
+        return pred,keyword
 
-        print("MultinomialNB Classifier", model.predict(dataset))
-        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
+
+"""        print("MultinomialNB Classifier", pred)
+        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))"""
