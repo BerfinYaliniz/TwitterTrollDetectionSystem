@@ -1,5 +1,8 @@
 import pandas as pd
 import tweepy, csv, re
+from PIL import Image
+import requests
+from io import BytesIO
 
 
 class makineogren():
@@ -9,22 +12,26 @@ class makineogren():
         self.tweetText = []
 
     def DownloadData(self, keyword):
-        auth = tweepy.OAuthHandler('xajlUJAhcoIaelSpK6N9sA71h', 'Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7', )
+
+        auth = tweepy.OAuthHandler('xajlUJAhcoIaelSpK6N9sA71h',
+                                   'Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7', )
 
         api = tweepy.API(auth)
         limit = int(1)
 
         # 1 bot  0 non bot
-        limit = tweepy.Cursor(api.user_timeline, screen_name=keyword).items(limit)
-
+        limit = tweepy.Cursor(api.user_timeline, screen_name=keyword, ).items(limit)
         # create DataFrame
-        columns = ['screen_name', 'location', 'description', 'verified']
+        columns = ['screen_name', 'location', 'description', 'verified', 'follower', 'following', 'url']
         data1 = []
 
         for tweet in limit:
             data1.append([tweet.user.screen_name, tweet.user.location,
-                          tweet.user.description, tweet.user.verified])
+                          tweet.user.description, tweet.user.verified, tweet.user.followers_count,
+                          tweet.user.friends_count, tweet.user.url])
+
         df1 = pd.DataFrame(data1, columns=columns)
+
         df1.to_csv('data/veri.csv')
 
         data1 = pd.read_csv('data/veri.csv')
@@ -53,7 +60,8 @@ class makineogren():
 
         # Creating NonBots identifying condition
         condition = (nonbots.screen_name.str.contains("bot", case=False) == False) | (
-                nonbots.description.str.contains("bot", case=False) == False) | (nonbots.location.isnull() == False) | (
+                nonbots.description.str.contains("bot", case=False) == False) | (
+                            nonbots.location.isnull() == False) | (
                             nonbots.verified == True)
 
         nonbots['screen_name_binary'] = (nonbots.screen_name.str.contains("bot", case=False) == False)
@@ -155,11 +163,18 @@ class makineogren():
         dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
         pred = model.predict(dataset)
         if pred == 1:
-            pred = "trol"
+            pred = "Trol"
         else:
-            pred = "trol değil"
+            pred = "Trol değil"
         print("multinom", pred)
-        return pred,keyword
+        follower = tweet.user.followers_count
+        following = tweet.user.friends_count
+        url = tweet.user.url
+        name = tweet.user.name
+        img = tweet.user.profile_image_url
+        bg_image = tweet.user.profile_banner_url
+
+        return pred, keyword, follower, following, url, name, img, bg_image
 
 
 """        print("MultinomialNB Classifier", pred)
