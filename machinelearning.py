@@ -165,7 +165,7 @@ class makineogren():
         if pred == 1:
             pred = "Trol"
         else:
-            pred = "Trol değil"
+            pred = "Not Trol"
         print("multinom", pred)
         follower = tweet.user.followers_count
         following = tweet.user.friends_count
