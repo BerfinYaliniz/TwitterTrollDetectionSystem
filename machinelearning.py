@@ -44,8 +44,9 @@ class makineogren():
         data1['verified_binary'] = (data1.verified == False)
         print(data1)
         data1.to_csv('data/sonuc.csv')
-        bots = pd.read_csv('data/bots_data.csv', encoding=('ISO-8859-1'))
-        nonbots = pd.read_csv('data/nonbots_data.csv', encoding=('ISO-8859-1'))
+        bots = pd.read_csv('data/bots_data.csv', encoding='ISO-8859-1')
+        nonbots = pd.read_csv('data/nonbots_data.csv', encoding='ISO-8859-1')
+
         # Creating Bots identifying condition
         # bots[bots.listedcount>10000]
         condition = (bots.screen_name.str.contains("bot", case=False) == True) | (
@@ -61,8 +62,7 @@ class makineogren():
         # Creating NonBots identifying condition
         condition = (nonbots.screen_name.str.contains("bot", case=False) == False) | (
                 nonbots.description.str.contains("bot", case=False) == False) | (
-                            nonbots.location.isnull() == False) | (
-                            nonbots.verified == True)
+                            nonbots.location.isnull() == False) | (nonbots.verified == True)
 
         nonbots['screen_name_binary'] = (nonbots.screen_name.str.contains("bot", case=False) == False)
         nonbots['description_binary'] = (nonbots.description.str.contains("bot", case=False) == False)
@@ -73,15 +73,15 @@ class makineogren():
         # Joining Bots and NonBots dataframes
         df = pd.concat([bots, nonbots])
         print("DataFrames created...")
+
         # Splitting data randombly into train_df and test_df
         from sklearn.model_selection import train_test_split
-
-        train_df, test_df = train_test_split(df, test_size=0.2)
+        train_df, test_df = train_test_split(df, test_size=0.70)
         print("Randomly splitting the dataset into training and test, and training classifiers...\n")
 
         # Using Decision Tree Classifier
         from sklearn.tree import DecisionTreeClassifier
-        from sklearn.metrics import accuracy_score, confusion_matrix
+        from sklearn.metrics import accuracy_score
 
         clf = DecisionTreeClassifier(criterion='entropy')
 
@@ -100,14 +100,12 @@ class makineogren():
 
         # Predicting on test data
         predicted = model.predict(X_test)
-
-        # Checking accuracy
-        print("Decision Tree Classifier Accuracy: {0}".format(accuracy_score(y_test, predicted)))
-
         data_df = pd.read_csv('data/sonuc.csv', encoding=('ISO-8859-1'))
         dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-
-        print("DECİSİON TREE tahmin", model.predict(dataset))
+        pred = model.predict(dataset)
+        print(pred)
+        # Checking accuracy
+        print("Decision Tree Classifier Accuracy: {0}".format(accuracy_score(y_test, predicted)))
 
         # Using Random Forest Classifier
         from sklearn.ensemble import RandomForestClassifier
@@ -132,8 +130,8 @@ class makineogren():
         predicted = model.predict(X_test)
         data_df = pd.read_csv('data/sonuc.csv', encoding=('ISO-8859-1'))
         dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-
-        print("Random Foresttahmin", model.predict(dataset))
+        pred = model.predict(dataset)
+        print(pred)
         # Checking accuracy
         print("Random Forest Classifier Accuracy: {0}".format(accuracy_score(y_test, predicted)))
 
@@ -161,20 +159,21 @@ class makineogren():
         # Checking accuracy
         data_df = pd.read_csv('data/sonuc.csv', encoding=('ISO-8859-1'))
         dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-        pred = model.predict(dataset)
+        predm = model.predict(dataset)
         if pred == 1:
-            pred = "Trol"
+            predm = "Trol"
         else:
-            pred = "Not Trol"
-        print("multinom", pred)
+            predm = "Not Trol"
         follower = tweet.user.followers_count
         following = tweet.user.friends_count
         url = tweet.user.url
         name = tweet.user.name
         img = tweet.user.profile_image_url
         bg_image = tweet.user.profile_banner_url
+        print("MultinomialNB Classifier", predm)
+        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
 
-        return pred, keyword, follower, following, url, name, img, bg_image
+        return predm, keyword, follower, following, url, name, img, bg_image
 
 
 """        print("MultinomialNB Classifier", pred)
