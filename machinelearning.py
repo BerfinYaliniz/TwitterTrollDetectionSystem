@@ -13,8 +13,8 @@ class makineogren():
 
     def DownloadData(self, keyword):
 
-        auth = tweepy.OAuthHandler('xajlUJAhcoIaelSpK6N9sA71h',
-                                   'Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7', )
+        auth = tweepy.OAuthHandler('*************',
+                                   '************', )
 
         api = tweepy.API(auth)
         limit = int(1)
