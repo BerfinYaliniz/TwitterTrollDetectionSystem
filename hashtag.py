@@ -15,8 +15,8 @@ class hashtag():
 
         # Enter your own credentials obtained
         # from your developer account
-        consumer_key = "xajlUJAhcoIaelSpK6N9sA71h"
-        consumer_secret = "Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7"
+        consumer_key = "**********"
+        consumer_secret = "*********"
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         api = tweepy.API(auth)
