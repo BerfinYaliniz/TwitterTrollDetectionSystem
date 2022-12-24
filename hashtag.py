@@ -1,7 +1,4 @@
-# Python Script to Extract tweets of a
-# particular Hashtag using Tweepy and Pandas
-
-# import modules
+import numpy as np
 import pandas as pd
 import tweepy
 
@@ -13,19 +10,13 @@ class hashtag():
 
     def scrape(self, words):
 
-        # Enter your own credentials obtained
-        # from your developer account
         consumer_key = "xajlUJAhcoIaelSpK6N9sA71h"
         consumer_secret = "Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7"
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         api = tweepy.API(auth)
 
-        # Enter Hashtag and initial date
-        print("Enter Twitter HashTag to search for")
-
-        # number of tweets you want to extract in one run
-        numtweet = 1
+        numtweet = int(100)
         # Creating DataFrame using pandas
         db = pd.DataFrame(columns=['username',
                                    'description',
@@ -37,19 +28,16 @@ class hashtag():
                                    'text',
                                    'hashtags',
                                    'verified',
-                                   'url'])
-        # restricted using .items(number of tweets)
+                                   'url',
+                                   'img'])
+
         tweets = tweepy.Cursor(api.search_tweets, words, lang="tr", tweet_mode='extended').items(numtweet)
 
-        # .Cursor() returns an iterable object. Each item in
-        # the iterator has various attributes
-        # that you can access to
-        # get information about each tweet
         list_tweets = [tweet for tweet in tweets]
 
-        def printtweetdata(n, ith_tweet):
+        def printtweetdata(ith_tweet):
             print()
-            print(f"Tweet {n}:")
+
             print(f"Username:{ith_tweet[0]}")
             print(f"Description:{ith_tweet[1]}")
             print(f"Location:{ith_tweet[2]}")
@@ -61,6 +49,7 @@ class hashtag():
             print(f"Hashtags Used:{ith_tweet[8]}")
             print(f"verified:{ith_tweet[9]}")
             print(f"url:{ith_tweet[10]}")
+            print(f"img:{ith_tweet[11]}")
 
         # Counter to maintain Tweet Count
         i = 1
@@ -79,12 +68,7 @@ class hashtag():
             verified = tweet.user.verified
             url = tweet.user.url
             img = tweet.user.profile_image_url
-            bg_image = tweet.user.profile_banner_url
 
-            # Retweets can be distinguished by
-            # a retweeted_status attribute,
-            # in case it is an invalid reference,
-            # except block will be executed
             try:
                 text = tweet.retweeted_status.full_text
             except AttributeError:
@@ -98,19 +82,19 @@ class hashtag():
             ith_tweet = [name, description,
                          location, following,
                          follower, totaltweets,
-                         retweetcount, text, hashtext, verified, url]
+                         retweetcount, text, hashtext, verified, url, img]
             db.loc[len(db)] = ith_tweet
 
             # Function call to print tweet data on screen
-            printtweetdata(i, ith_tweet)
+            printtweetdata(ith_tweet)
             i = i + 1
-        filename = 'scraped_tweets.csv'
+        filename = 'data/scraped_tweets.csv'
 
         # we will save our database as a CSV file.
         db.to_csv(filename)
         print('Scraping has completed!')
         data1 = []
-        data1 = pd.read_csv('scraped_tweets.csv')
+        data1 = db
         condition = (data1.username.str.contains("bot", case=False) == True) | (
                 data1.description.str.contains("bot", case=False) == True) | (data1.location.isnull()) | (
                             data1.verified == False)
@@ -118,12 +102,10 @@ class hashtag():
         data1['description_binary'] = (data1.description.str.contains("bot", case=False) == True)
         data1['location_binary'] = (data1.location.isnull())
         data1['verified_binary'] = (data1.verified == False)
-        print(data1)
-        data1.to_csv('scraped_tweets.csv')
+        data1.to_csv('data/scraped_tweets.csv')
         bots = pd.read_csv('data/bots_data.csv', encoding=('ISO-8859-1'))
         nonbots = pd.read_csv('data/nonbots_data.csv', encoding=('ISO-8859-1'))
-        # Creating Bots identifying condition
-        # bots[bots.listedcount>10000]
+
         condition = (bots.screen_name.str.contains("bot", case=False) == True) | (
                 bots.description.str.contains("bot", case=False) == True) | (bots.location.isnull()) | (
                             bots.verified == False)
@@ -155,64 +137,6 @@ class hashtag():
         train_df, test_df = train_test_split(df, test_size=0.2)
         print("Randomly splitting the dataset into training and test, and training classifiers...\n")
 
-        # Using Decision Tree Classifier
-        from sklearn.tree import DecisionTreeClassifier
-        from sklearn.metrics import accuracy_score, confusion_matrix
-
-        clf = DecisionTreeClassifier(criterion='entropy')
-
-        # 80%
-        X_train = train_df[
-            ['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]  # train_data
-        y_train = train_df['bot']  # train_target
-
-        # 20%
-        X_test = test_df[
-            ['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]  # test_Data
-        y_test = test_df['bot']  # test_target
-
-        # Training on decision tree classifier
-        model = clf.fit(X_train, y_train)
-
-        # Predicting on test data
-        predicted = model.predict(X_test)
-
-        # Checking accuracy
-        print("Decision Tree Classifier Accuracy: {0}".format(accuracy_score(y_test, predicted)))
-
-        data_df = pd.read_csv('scraped_tweets.csv', encoding=('ISO-8859-1'))
-        dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-
-        print("DECİSİON TREE tahmin", model.predict(dataset))
-
-        # Using Random Forest Classifier
-        from sklearn.ensemble import RandomForestClassifier
-        from sklearn.metrics import accuracy_score
-
-        clf = RandomForestClassifier(min_samples_split=50, min_samples_leaf=200)
-
-        # 80%
-        X_train = train_df[
-            ['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]  # train_data
-        y_train = train_df['bot']  # train_target
-
-        # 20%
-        X_test = test_df[
-            ['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]  # test_Data
-        y_test = test_df['bot']  # test_target
-
-        # Training on decision tree classifier
-        model = clf.fit(X_train, y_train)
-
-        # Predicting on test data
-        predicted = model.predict(X_test)
-        data_df = pd.read_csv('scraped_tweets.csv', encoding=('ISO-8859-1'))
-        dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-
-        print("Random Foresttahmin", model.predict(dataset))
-        # Checking accuracy
-        print("Random Forest Classifier Accuracy: {0}".format(accuracy_score(y_test, predicted)))
-
         # Using MultinomialNB Classifier
         from sklearn.naive_bayes import MultinomialNB
         from sklearn.metrics import accuracy_score
@@ -227,25 +151,24 @@ class hashtag():
         X_test = test_df[
             ['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]  # test_Data
         y_test = test_df['bot']  # test_target
-        model = clf.fit(X_train, y_train)
-        print("MultinomialNB Classifier", model.predict(dataset))
-        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
 
-        # Training on decision tree classifier
         model = clf.fit(X_train, y_train)
 
         # Predicting on test data
         predicted = model.predict(X_test)
-        # Checking accuracy
-        data_df = pd.read_csv('scraped_tweets.csv', encoding=('ISO-8859-1'))
-        dataset = data_df[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
-        predm = model.predict(dataset)
-        if predm == 1:
-            predm = "Trol"
-        else:
-            predm = "Not Trol"
+        dataset = data1[['screen_name_binary', 'description_binary', 'location_binary', 'verified_binary']]
+        tahmin = model.predict(dataset)
+        for predm in tahmin:
+            if predm == 1:
+                predm = "Trol"
+            else:
+                predm = "Not"
+            print(predm)
+        dfr = pd.read_csv('data/scraped_tweets.csv')
+        dfr['troldurum'] = predm
+        dfr.to_csv('data/sonsonuc.csv', index=None)
+        return words
 
-        print("MultinomialNB Classifier", predm)
-        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
 
-        return predm, words, follower, following, url, name, img, bg_image
+"""
+print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))"""

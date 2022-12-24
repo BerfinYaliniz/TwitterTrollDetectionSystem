@@ -13,8 +13,8 @@ class makineogren():
 
     def DownloadData(self, keyword):
 
-        auth = tweepy.OAuthHandler('*************',
-                                   '************', )
+        auth = tweepy.OAuthHandler('xajlUJAhcoIaelSpK6N9sA71h',
+                                   'Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7', )
 
         api = tweepy.API(auth)
         limit = int(1)
@@ -164,17 +164,14 @@ class makineogren():
             predm = "Trol"
         else:
             predm = "Not Trol"
+        print("MultinomialNB Classifier", predm)
+        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
         follower = tweet.user.followers_count
         following = tweet.user.friends_count
         url = tweet.user.url
         name = tweet.user.name
         img = tweet.user.profile_image_url
-        bg_image = tweet.user.profile_banner_url
         print("MultinomialNB Classifier", predm)
         print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))
 
-        return predm, keyword, follower, following, url, name, img, bg_image
-
-
-"""        print("MultinomialNB Classifier", pred)
-        print("MultinomialNB Classifier Accuary: {0}".format(accuracy_score(y_test, predicted)))"""
+        return predm, keyword, follower, following, url, name, img
