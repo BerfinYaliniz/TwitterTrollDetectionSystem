@@ -1,7 +1,8 @@
 import pandas as pd
 from flask import Flask, render_template, request, jsonify
+from hashtag import hashtag
 from pandas import read_csv
-from trol.hashtag import hashtag
+
 
 from tweepy import tweet
 
