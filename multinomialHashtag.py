@@ -10,8 +10,8 @@ class multinomialHashtag():
 
     def scrape(self, words):
 
-        consumer_key = "xajlUJAhcoIaelSpK6N9sA71h"
-        consumer_secret = "Svgrdt7cOFmpOhsWQ24wJrYGFVd4x7HuhVV5MZodZrAz7ttQF7"
+        consumer_key = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        consumer_secret = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
         api = tweepy.API(auth)
